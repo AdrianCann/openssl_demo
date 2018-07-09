@@ -1,6 +1,8 @@
 require 'openssl'
 
 class Secret
+  ITERATIONS = 2000
+
   attr_accessor :cipher, :message
 
   def initialize(message = nil)
@@ -13,10 +15,9 @@ class Secret
     iv = cipher.random_iv
 
     salt = OpenSSL::Random.random_bytes 16
-    iter = 20000
     key_len = cipher.key_len
     digest = OpenSSL::Digest::SHA256.new
-    key = OpenSSL::PKCS5.pbkdf2_hmac(pwd, salt, iter, key_len, digest)
+    key = OpenSSL::PKCS5.pbkdf2_hmac(pwd, salt, ITERATIONS, key_len, digest)
     cipher.key = key
 
     encrypted = cipher.update message
@@ -31,10 +32,9 @@ class Secret
     cipher.iv = File.read('data/encryped_message_iv')
 
     salt = File.read('data/encryped_message_salt')
-    iter = 20000
     key_len = cipher.key_len
     digest = OpenSSL::Digest::SHA256.new
-    key = OpenSSL::PKCS5.pbkdf2_hmac(pwd, salt, iter, key_len, digest)
+    key = OpenSSL::PKCS5.pbkdf2_hmac(pwd, salt, ITERATIONS, key_len, digest)
 
     cipher.key = key
 
